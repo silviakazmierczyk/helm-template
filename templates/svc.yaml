@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Values.name}}
+spec:
+  selector:
+    app: {{.Values.name}}
+  type: {{.Values.svc.type}}
+  ports:
+    - name: tcp-{{.Values.image.port}}
+      protocol: TCP
+      port: {{.Values.image.port}}
+      targetPort: {{.Values.image.port}}
+  {{- if .Values.svc.additionalPorts }}
+    {{- toYaml .Values.svc.extraPorts | nindent 4 }}
+  {{- end }}
