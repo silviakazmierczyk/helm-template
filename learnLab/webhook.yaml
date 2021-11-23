@@ -1,0 +1,41 @@
+name: webhook-alarms
+
+image:
+  repository: quay.io/francisco_javier_bernal/webhook2kafka
+  tag: latest
+  port: 8000
+
+replicas: 1
+
+route:
+  enabled: true
+
+svc:
+  type: ClusterIP
+  additionalPorts: false
+  extraPorts: 
+    - name: udp-514
+      protocol: UDP
+      port: 514
+      targetPort: 514
+
+envVars:
+  enabled: false
+  vars:
+    - name: KAFKA_BROKERCONNECT
+      value: "my-cluster-kafka-bootstrap.openshift-operators.svc.cluster.local:9092"
+
+configmap:
+  enabled: false
+  volumeMounts:
+    - name: telegraf-conf
+      mountPath: /etc/telegraf/
+  volumes:
+    - name: telegraf-conf
+      configMap:
+        name: telegraf-conf
+  data: 
+    telegraf.conf: |
+      # Global tags can be specified here in key="value" format.
+      [global_tags]
+        # dc = "us-east-1" # will tag all metrics with dc=us-east-1

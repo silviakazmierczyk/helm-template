@@ -1,0 +1,65 @@
+name: kafdrop
+
+image:
+  repository: obsidiandynamics/kafdrop
+  tag: latest
+  port: 9000
+
+replicas: 1
+
+route:
+  enabled: true
+
+svc:
+  type: ClusterIP
+  additionalPorts: false
+  extraPorts: 
+    - name: udp-514
+      protocol: UDP
+      port: 514
+      targetPort: 514
+
+envVars:
+  enabled: true
+  vars:
+    - name: KAFKA_BROKERCONNECT
+      value: "my-cluster-kafka-bootstrap.openshift-operators.svc.cluster.local:9092"
+    - name: KAFKA_PROPERTIES
+      value: ""
+    - name: KAFKA_TRUSTSTORE
+      value: ""
+    - name: KAFKA_KEYSTORE
+      value: ""
+    - name: JVM_OPTS
+      value: ""
+    - name: JMX_PORT
+      value: "8686"
+    - name: HOST
+      value: ""
+    - name: SERVER_SERVLET_CONTEXTPATH
+      value: ""
+    - name: KAFKA_PROPERTIES_FILE
+      value: "kafka.properties"
+    - name: KAFKA_TRUSTSTORE_FILE
+      value: "kafka.truststore.jks"
+    - name: KAFKA_KEYSTORE_FILE
+      value: "kafka.keystore.jks"
+    - name: SERVER_PORT
+      value: "9000"
+    - name: CMD_ARGS
+      value: ""
+
+configmap:
+  enabled: false
+  volumeMounts:
+    - name: telegraf-conf
+      mountPath: /etc/telegraf/
+  volumes:
+    - name: telegraf-conf
+      configMap:
+        name: telegraf-conf
+  data: 
+    telegraf.conf: |
+      # Global tags can be specified here in key="value" format.
+      [global_tags]
+        # dc = "us-east-1" # will tag all metrics with dc=us-east-1

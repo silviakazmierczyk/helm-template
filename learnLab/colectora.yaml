@@ -1,0 +1,38 @@
+name: colectora-rsyslog
+
+image:
+  repository: pdelval/rsyslog
+  tag: 8.0
+  port: 5140
+
+replicas: 1
+
+route:
+  enabled: true
+
+svc:
+  type: NodePort
+  additionalPorts: true
+  extraPorts: 
+    - name: udp-5140
+      protocol: UDP
+      port: 5140
+      targetPort: 5140
+
+envVars:
+  enabled: false
+  vars:
+    - name: KAFKA_BROKERCONNECT
+      value: "mano-kafka-cluster-kafka-bootstrap.kafka-cluster-operator.svc.cluster.local:9092"
+
+configmap:
+  enabled: false
+  volumeMounts:
+    - name: telegraf-conf
+      mountPath: /etc/telegraf/
+  volumes:
+    - name: telegraf-conf
+      configMap:
+        name: telegraf-conf
+  data: 
+    telegraf.conf: |
