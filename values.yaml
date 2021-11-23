@@ -2,7 +2,7 @@ name: contrail-metrics
 
 image:
   repository: silviakazmi/contrail-metrics
-  tag: "35.0"
+  tag: "35.1"
   port: 8000
 
 replicas: 1
